@@ -1,6 +1,6 @@
 from tracker import update_tracker, update_tracker_api
 import cv2
-from configs.cfg import cfg
+from configs.cfg import DEFAULT_CFG
 
 
 class baseDet(object):
@@ -10,9 +10,9 @@ class baseDet(object):
         # self.img_size = 640
         # self.threshold = 0.3
         # self.stride = 1
-        self.img_size = cfg["det"]["img_size"]
-        self.threshold = cfg["det"]["threshold"]
-        self.stride = cfg["det"]["stride"]
+        self.img_size = DEFAULT_CFG.det.img_size
+        self.threshold = DEFAULT_CFG.det.threshold
+        self.stride = DEFAULT_CFG.det.stride
 
     def build_config(self):
 
@@ -39,7 +39,7 @@ class baseDet(object):
         im, faces, face_bboxes = update_tracker(self, im)
 
         retDict['frame'] = im                      # 原始图像
-        retDict['faces'] = faces                   # 目标图像，trackId
+        retDict['faces'] = faces                   # 目标图像 + trackId
         retDict['face_bboxes'] = face_bboxes       # bbox
 
         return retDict

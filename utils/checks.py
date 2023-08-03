@@ -208,3 +208,28 @@ def is_ascii(s) -> bool:
 
     # Check if the string is composed of only ASCII characters
     return all(ord(c) < 128 for c in s)
+
+def check_file(file, suffix='', download=True, hard=True):
+    """Search/download file (if necessary) and return path."""
+    check_suffix(file, suffix)  # optional
+    file = str(file).strip()  # convert to string and strip spaces
+    file = check_yolov5u_filename(file)  # yolov5n -> yolov5nu
+    if not file or ('://' not in file and Path(file).exists()):  # exists ('://' check required in Windows Python<3.10)
+        return file
+    elif download and file.lower().startswith(('https://', 'http://', 'rtsp://', 'rtmp://')):  # download
+        url = file  # warning: Pathlib turns :// -> :/
+        file = url2file(file)  # '%2F' to '/', split https://url.com/file.txt?auth
+        if Path(file).exists():
+            LOGGER.info(f'Found {clean_url(url)} locally at {file}')  # file already exists
+        # else:
+        #     downloads.safe_download(url=url, file=file, unzip=False)
+        return file
+    else:  # search
+        files = []
+        for d in 'models', 'datasets', 'tracker/cfg', 'yolo/cfg':  # search directories
+            files.extend(glob.glob(str(ROOT / d / '**' / file), recursive=True))  # find file
+        if not files and hard:
+            raise FileNotFoundError(f"'{file}' does not exist")
+        elif len(files) > 1 and hard:
+            raise FileNotFoundError(f"Multiple files match '{file}', specify exact path: {files}")
+        return files[0] if len(files) else []  # return file

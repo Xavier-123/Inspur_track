@@ -1,11 +1,13 @@
 api:
-  port: &port 9045
-#  url: http://localhost:*port/inspur_track
+  port: 9045
+  host: 192.168.12.84
 
 det:
-  source: E:\work\AI_Project\ComputerVision\target_track\deep_tracking\examples\cat.mp4
-  model_path: D:/Inspur/base_model/yolo8/yolov8s.pt
-  device: None
+#  source: E:\work\AI_Project\ComputerVision\target_track\deep_tracking\examples\cat.mp4
+  source: E:\work\AI_Project\ComputerVision\target_track\yolo_tracking\examples\test.mp4
+#  source: 0
+  model_path: D:/Inspur/base_model/yolo8/yolov8n.pt
+  device: cpu
   img_size: 640
   threshold: 0.3
   conf_thres: 0.25
@@ -16,5 +18,9 @@ det:
 
 
 track:
-  method: deep_sort
-  max_history_id: 50    # 丢失超过多少帧就删除
+  api: False    # use api
+  method: deep_sort   # use track method
+  max_history_id: 50  # allow lost max frames
+  save: True
+  track_target: ['cat', 'car', 'person']
+  show: True

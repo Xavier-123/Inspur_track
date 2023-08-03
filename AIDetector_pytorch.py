@@ -4,21 +4,31 @@ from utils.general import non_max_suppression
 from utils.BaseDetector import baseDet
 from utils.torch_utils import select_device
 from utils.dataloaders import letterbox
+from utils.checks import check_file
 from pathlib import Path
 from models.model import YOLO
 
-from models.tasks import attempt_load_one_weight
+from models.tasks import attempt_load_one_weight, guess_model_task
 from yolo.data.augment import LetterBox
 from yolo.engine.results import Results
 from utils import ops
-from configs.cfg import cfg
+from configs.cfg import DEFAULT_CFG
 
 
 class Detector(baseDet):
 
-    def __init__(self):
+    def __init__(self, is_init):
         super(Detector, self).__init__()
-        self.init_model()
+
+        self.overrides = {}
+        if DEFAULT_CFG.det.device:
+            self.device = str(DEFAULT_CFG.det.device)
+        else:
+            self.device = '0' if torch.cuda.is_available() else 'cpu'
+        self.device = select_device(self.device)
+
+        if is_init:
+            self.init_model()
         self.build_config()
 
     @staticmethod
@@ -28,25 +38,21 @@ class Detector(baseDet):
         return {k: v for k, v in args.items() if k in include}
 
     def _load(self, weights: str, task=None, device="cpu"):
-        """
-        Initializes a new model and infers the task type from the model head.
-
-        Args:
-            weights (str): model checkpoint to be loaded
-            task (str | None): model task
-        """
         suffix = Path(weights).suffix
         if suffix == '.pt':
             self.model, self.ckpt = attempt_load_one_weight(weights, device=device)
             self.task = self.model.args['task']
             self.overrides = self.model.args = self._reset_ckpt_args(self.model.args)
             self.ckpt_path = self.model.pt_path
+        else:
+            weights = check_file(weights)
+            self.model, self.ckpt = weights, None
+            self.task = task or guess_model_task(weights)
+            self.ckpt_path = weights
         self.overrides['model'] = weights
         self.overrides['task'] = self.task
 
     def init_model(self):
-        self.device = '0' if torch.cuda.is_available() else 'cpu'
-        self.device = select_device(self.device)
 
         # model = YOLO(r'D:/Inspur/base_model/yolo8/yolov8s.pt')  # load a custom model
         # # model.model.to(self.device).eval()
@@ -55,9 +61,10 @@ class Detector(baseDet):
         # self.m = model
         # self.names = model.module.names if hasattr(model, 'module') else model.names
 
-        # 脱离ultralytics
-        self._load(r'D:/Inspur/base_model/yolo8/yolov8s.pt', device=self.device)
+        print("开始加载模型......, " + str(DEFAULT_CFG.det.model_path))
+        self._load(DEFAULT_CFG.det.model_path, device=self.device)
         self.m = self.model.eval()
+        print("加载模型完成")
 
     def preprocess(self, img):
 
@@ -133,7 +140,7 @@ class Detector(baseDet):
                     _conf = conf.item()
 
                     # if not lbl in ['person', 'car', 'truck', 'cat']:  # ['person', 'car', 'truck', 'cat']需要追踪的类别
-                    if not lbl in cfg["det"]["target"]:
+                    if not lbl in DEFAULT_CFG.det.target:
                         continue
                     x1, y1 = int(x[0]), int(x[1])
                     x2, y2 = int(x[2]), int(x[3])

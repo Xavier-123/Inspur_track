@@ -53,7 +53,7 @@ num_classes = max(len(trainloader.dataset.classes), len(testloader.dataset.class
 start_epoch = 0
 net = Net(num_classes=num_classes)
 if args.resume:
-    assert os.path.isfile("./checkpoint/ckpt.t7"), "Error: no checkpoint file found!"
+    assert os.path.isfile("checkpoint/ckpt.t7"), "Error: no checkpoint file found!"
     print('Loading from checkpoint/ckpt.t7')
     checkpoint = torch.load("./checkpoint/ckpt.t7")
     # import ipdb; ipdb.set_trace()
@@ -141,7 +141,7 @@ def test(epoch):
         }
         if not os.path.isdir('checkpoint'):
             os.mkdir('checkpoint')
-        torch.save(checkpoint, './checkpoint/ckpt.t7')
+        torch.save(checkpoint, 'checkpoint/ckpt.t7')
 
     return test_loss/len(testloader), 1.- correct/total
 

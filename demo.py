@@ -1,15 +1,13 @@
 from AIDetector_pytorch import Detector
-from configs.cfg import cfg
+from configs.cfg import DEFAULT_CFG
 import imutils
 import cv2
 
 def main():
 
     name = 'demo'
-    det = Detector()
-    # cap = cv2.VideoCapture(r'E:\work\AI_Project\ComputerVision\target_track\deep_tracking\examples\cat.mp4')
-    cap = cv2.VideoCapture(cfg["det"]["source"])
-    # cap = cv2.VideoCapture(0)
+    det = Detector(True)
+    cap = cv2.VideoCapture(DEFAULT_CFG.det.source)
     fps = int(cap.get(5))
     print('fps:', fps)
     t = int(1000/fps)
@@ -20,6 +18,7 @@ def main():
 
         # try:
         _, im = cap.read()
+        # print(_)
         if im is None:
             break
         
@@ -27,19 +26,23 @@ def main():
         # print("result------>:", result["faces"], result["face_bboxes"])
         result = result['frame']
         result = imutils.resize(result, height=500)
-        if videoWriter is None:
-            fourcc = cv2.VideoWriter_fourcc(
-                'm', 'p', '4', 'v')  # opencv3.0
-            videoWriter = cv2.VideoWriter(
-                'result.mp4', fourcc, fps, (result.shape[1], result.shape[0]))
 
-        videoWriter.write(result)
-        cv2.imshow(name, result)
-        cv2.waitKey(t)
+        # 保存跟踪视频
+        if DEFAULT_CFG.track.save:
+            if videoWriter is None:
+                fourcc = cv2.VideoWriter_fourcc(
+                    'm', 'p', '4', 'v')  # opencv3.0
+                videoWriter = cv2.VideoWriter(
+                    'result.mp4', fourcc, fps, (result.shape[1], result.shape[0]))
+            videoWriter.write(result)
 
-        if cv2.getWindowProperty(name, cv2.WND_PROP_AUTOSIZE) < 1:
-            # 点x退出
-            break
+        if DEFAULT_CFG.track.show:
+            cv2.imshow(name, result)
+            cv2.waitKey(t)
+
+            if cv2.getWindowProperty(name, cv2.WND_PROP_AUTOSIZE) < 1:
+                # 点x退出
+                break
 
     cap.release()
     videoWriter.release()
@@ -49,9 +52,8 @@ def main():
 # 调用api
 def run_api():
     name = 'demo'
-    det = Detector()
-    cap = cv2.VideoCapture(r'E:\work\AI_Project\ComputerVision\target_track\deep_tracking\examples\cat.mp4')
-    # cap = cv2.VideoCapture(0)
+    det = Detector(False)
+    cap = cv2.VideoCapture(DEFAULT_CFG.det.source)
     fps = int(cap.get(5))
     print('fps:', fps)
     t = int(1000/fps)
@@ -71,14 +73,15 @@ def run_api():
                 'm', 'p', '4', 'v')  # opencv3.0
             videoWriter = cv2.VideoWriter(
                 'result.mp4', fourcc, fps, (result.shape[1], result.shape[0]))
+            videoWriter.write(result)
 
-        videoWriter.write(result)
-        cv2.imshow(name, result)
-        cv2.waitKey(t)
+        if DEFAULT_CFG.track.show:
+            cv2.imshow(name, result)
+            cv2.waitKey(t)
 
-        if cv2.getWindowProperty(name, cv2.WND_PROP_AUTOSIZE) < 1:
-            # 点x退出
-            break
+            if cv2.getWindowProperty(name, cv2.WND_PROP_AUTOSIZE) < 1:
+                # 点x退出
+                break
 
     cap.release()
     videoWriter.release()
@@ -88,8 +91,10 @@ def run_api():
 
 if __name__ == '__main__':
 
-    # 本地运行目标检测
-    # main()
+    if DEFAULT_CFG.track.api:
+        # 调用api实现目标检测
+        run_api()
+    else:
+        # 本地运行目标检测
+        main()
 
-    # 调用api实现目标检测
-    run_api()

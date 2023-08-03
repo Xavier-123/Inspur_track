@@ -3,6 +3,7 @@
 import torch
 
 from ultralytics.yolo.engine.predictor import BasePredictor
+from ultralytics.yolo.engine.predictor import BasePredictor
 from ultralytics.yolo.engine.results import Results
 from ultralytics.yolo.utils import DEFAULT_CFG, ROOT, ops
 

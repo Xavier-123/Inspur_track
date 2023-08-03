@@ -189,7 +189,7 @@ def yaml_load(file='data.yaml', append_filename=False):
         # Add YAML filename to dict and return
         return {**yaml.safe_load(s), 'yaml_file': str(file)} if append_filename else yaml.safe_load(s)
 
-DEFAULT_CFG_PATH = r'C:\Users\Xavier\Desktop\yolov8_802\models\v8\default.yaml'
+DEFAULT_CFG_PATH = r'./models/v8/default.yaml'
 DEFAULT_CFG_DICT = yaml_load(DEFAULT_CFG_PATH)
 for k, v in DEFAULT_CFG_DICT.items():
     if isinstance(v, str) and v.lower() == 'none':

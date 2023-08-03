@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Any
 from fastapi import FastAPI, Request, status
 from AIDetector_pytorch import Detector
-from configs.cfg import cfg
+from configs.cfg import DEFAULT_CFG
 import uvicorn
 import logging
 import base64
@@ -51,7 +51,7 @@ def _b642cv(img_b64):
           tags=["AN推理接口"])  # 标签，swagger显示，非必须
 def inspur_track(trainData: Train_Data):
     try:
-        det = Detector()
+        # det = Detector()
 
         # base64转图像
         img = _b642cv(trainData.imgbase64)
@@ -65,6 +65,5 @@ def inspur_track(trainData: Train_Data):
 
 
 if __name__ == '__main__':
-    # uvicorn.run(app, host='0.0.0.0', port=cfg.port, log_config=None, access_log=False)
-    print(cfg["api"]["port"])
-    uvicorn.run(app, host='0.0.0.0', port=cfg["api"]["port"], log_config=None, access_log=False)
+    det = Detector(True)
+    uvicorn.run(app, host='0.0.0.0', port=DEFAULT_CFG.api.port, log_config=None, access_log=False)
