@@ -1,6 +1,6 @@
-from deep_sort.utils.parser import get_config
-from deep_sort.deep_sort import DeepSort
-from configs.cfg import cfg as model_cfg
+from MMT.deep_sort.utils.parser import get_config
+from MMT.deep_sort.deep_sort import DeepSort
+from configs.cfg import DEFAULT_CFG
 from configs.cfg import url
 import torch
 import cv2
@@ -10,7 +10,7 @@ import base64
 
 palette = (2 ** 11 - 1, 2 ** 15 - 1, 2 ** 20 - 1)
 cfg = get_config()
-cfg.merge_from_file("deep_sort/configs/deep_sort.yaml")
+cfg.merge_from_file("MMT/deep_sort/configs/deep_sort.yaml")
 deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
                     max_dist=cfg.DEEPSORT.MAX_DIST, min_confidence=cfg.DEEPSORT.MIN_CONFIDENCE,
                     nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
@@ -103,7 +103,7 @@ def update_tracker(target_detector, image):
         if not history_id in current_ids:
             target_detector.faceTracker[history_id] -= 1
         # if target_detector.faceTracker[history_id] < -5:
-        if target_detector.faceTracker[history_id] < -int(model_cfg["track"]["max_history_id"]):
+        if target_detector.faceTracker[history_id] < -int(DEFAULT_CFG.track.max_history_id):
             ids2delete.append(history_id)
 
     for ids in ids2delete:
@@ -162,7 +162,7 @@ def update_tracker_api(target_detector, image):
     for history_id in target_detector.faceTracker:
         if not history_id in current_ids:
             target_detector.faceTracker[history_id] -= 1
-        if target_detector.faceTracker[history_id] < -int(model_cfg["track"]["max_history_id"]):
+        if target_detector.faceTracker[history_id] < -int(DEFAULT_CFG.track.max_history_id):
             ids2delete.append(history_id)
 
     for ids in ids2delete:

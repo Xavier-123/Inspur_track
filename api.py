@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Any
 from fastapi import FastAPI, Request, status
 from AIDetector_pytorch import Detector
-from configs.cfg import cfg
+from configs.cfg import DEFAULT_CFG
 import uvicorn
 import logging
 import base64
@@ -66,5 +66,5 @@ def inspur_track(trainData: Train_Data):
 
 if __name__ == '__main__':
     # uvicorn.run(app, host='0.0.0.0', port=cfg.port, log_config=None, access_log=False)
-    print(cfg["api"]["port"])
-    uvicorn.run(app, host='0.0.0.0', port=cfg["api"]["port"], log_config=None, access_log=False)
+    # print(cfg["api"]["port"])
+    uvicorn.run(app, host='0.0.0.0', port=DEFAULT_CFG.api.port, log_config=None, access_log=False)

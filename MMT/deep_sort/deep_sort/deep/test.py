@@ -38,7 +38,7 @@ galleryloader = torch.utils.data.DataLoader(
 
 # net definition
 net = Net(reid=True)
-assert os.path.isfile("./checkpoint/ckpt.t7"), "Error: no checkpoint file found!"
+assert os.path.isfile("checkpoint/ckpt.t7"), "Error: no checkpoint file found!"
 print('Loading from checkpoint/ckpt.t7')
 checkpoint = torch.load("./checkpoint/ckpt.t7")
 net_dict = checkpoint['net_dict']

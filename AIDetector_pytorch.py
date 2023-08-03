@@ -11,7 +11,7 @@ from models.tasks import attempt_load_one_weight
 from yolo.data.augment import LetterBox
 from yolo.engine.results import Results
 from utils import ops
-from configs.cfg import cfg
+from configs.cfg import DEFAULT_CFG
 
 
 class Detector(baseDet):
@@ -56,8 +56,11 @@ class Detector(baseDet):
         # self.names = model.module.names if hasattr(model, 'module') else model.names
 
         # 脱离ultralytics
-        self._load(r'D:/Inspur/base_model/yolo8/yolov8s.pt', device=self.device)
+        print("开始加载模型......, " + str(DEFAULT_CFG.det.model_path))
+        # self._load(r'D:/Inspur/base_model/yolo8/yolov8s.pt', device=self.device)
+        self._load(DEFAULT_CFG.det.model_path, device=self.device)
         self.m = self.model.eval()
+        print("加载模型完成")
 
     def preprocess(self, img):
 
@@ -133,7 +136,7 @@ class Detector(baseDet):
                     _conf = conf.item()
 
                     # if not lbl in ['person', 'car', 'truck', 'cat']:  # ['person', 'car', 'truck', 'cat']需要追踪的类别
-                    if not lbl in cfg["det"]["target"]:
+                    if not lbl in DEFAULT_CFG.det.target:
                         continue
                     x1, y1 = int(x[0]), int(x[1])
                     x2, y2 = int(x[2]), int(x[3])
