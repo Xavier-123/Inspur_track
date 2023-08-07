@@ -60,7 +60,7 @@ class Detector(baseDet):
         # model.model.float()  # half() or float()
         # self.m = model
         # self.names = model.module.names if hasattr(model, 'module') else model.names
-
+        # 脱离ultralytics
         print("开始加载模型......, " + str(DEFAULT_CFG.det.model_path))
         self._load(DEFAULT_CFG.det.model_path, device=self.device)
         self.m = self.model.eval()

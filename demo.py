@@ -1,5 +1,6 @@
 from AIDetector_pytorch import Detector
 from configs.cfg import DEFAULT_CFG
+from utils import LOGGER
 import imutils
 import cv2
 
@@ -11,8 +12,15 @@ def main():
     fps = int(cap.get(5))
     print('fps:', fps)
     t = int(1000/fps)
-
     videoWriter = None
+    frame_id = 0
+
+    # 清空文件
+    if DEFAULT_CFG.track.save:
+        path = str(DEFAULT_CFG.track.save_path) + "/save_result.txt"
+        with open(path, 'w') as f:
+            f.truncate(0)
+        LOGGER.info("清空save_result.txt")
 
     while True:
 
@@ -21,8 +29,7 @@ def main():
         # print(_)
         if im is None:
             break
-        
-        result = det.feedCap(im)
+        result = det.feedCap(im, frame_id)
         # print("result------>:", result["faces"], result["face_bboxes"])
         result = result['frame']
         result = imutils.resize(result, height=500)
@@ -35,6 +42,7 @@ def main():
                 videoWriter = cv2.VideoWriter(
                     'result.mp4', fourcc, fps, (result.shape[1], result.shape[0]))
             videoWriter.write(result)
+
 
         if DEFAULT_CFG.track.show:
             cv2.imshow(name, result)
@@ -58,13 +66,20 @@ def run_api():
     print('fps:', fps)
     t = int(1000/fps)
     videoWriter = None
+    frame_id = 0
+
+    # 清空文件
+    if DEFAULT_CFG.track.save:
+        with open(str(DEFAULT_CFG.track.save_path) + "/save_result.txt") as f:
+            f.truncate(0)
+        LOGGER.info("清空save_result.txt")
 
     while True:
 
         _, im = cap.read()
         if im is None:
             break
-        result = det.feedCap_api(im)
+        result = det.feedCap_api(im, frame_id)
         # print("result------>:", result["faces"], result["face_bboxes"])
         result = result['frame']
         result = imutils.resize(result, height=500)

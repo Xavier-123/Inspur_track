@@ -8,6 +8,8 @@ import requests
 import json
 import base64
 
+
+# save_result = "./save_reslut"
 palette = (2 ** 11 - 1, 2 ** 15 - 1, 2 ** 20 - 1)
 cfg = get_config()
 cfg.merge_from_file("MMT/deep_sort/configs/deep_sort.yaml")
@@ -16,7 +18,6 @@ deepsort = DeepSort(cfg.DEEPSORT.REID_CKPT,
                     nms_max_overlap=cfg.DEEPSORT.NMS_MAX_OVERLAP, max_iou_distance=cfg.DEEPSORT.MAX_IOU_DISTANCE,
                     max_age=cfg.DEEPSORT.MAX_AGE, n_init=cfg.DEEPSORT.N_INIT, nn_budget=cfg.DEEPSORT.NN_BUDGET,
                     use_cuda=True)
-
 
 def plot_bboxes(image, bboxes, line_thickness=None):
     # Plots one bounding box on image img
@@ -98,6 +99,12 @@ def update_tracker(target_detector, image):
                 (x1, y1, x2, y2)
             )
 
+        # 保存txt
+        with open(str(DEFAULT_CFG.track.save_path) + "/save_result.txt", 'a') as f:
+            # print("frame_id---> ", deepsort.frame_id)
+            f.write(str(deepsort.frame_id) + ', ' + str(value) + '\n')
+    deepsort.frame_id += 1
+
     ids2delete = []
     for history_id in target_detector.faceTracker:
         if not history_id in current_ids:
@@ -158,6 +165,11 @@ def update_tracker_api(target_detector, image):
             face_bboxes.append(
                 (x1, y1, x2, y2)
             )
+
+        # 保存txt
+        with open(str(DEFAULT_CFG.track.save_path) + "/save_result.txt", 'a') as f:
+            f.write(str(deepsort.frame_id) + ', ' + str(value) + '\n')
+    deepsort.frame_id += 1
 
     ids2delete = []
     for history_id in target_detector.faceTracker:
