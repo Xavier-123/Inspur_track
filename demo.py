@@ -36,6 +36,7 @@ def main():
                     'result.mp4', fourcc, fps, (result.shape[1], result.shape[0]))
             videoWriter.write(result)
 
+
         if DEFAULT_CFG.track.show:
             cv2.imshow(name, result)
             cv2.waitKey(t)
